@@ -12,7 +12,7 @@
         <br>
         <input type="text" name="username" />
         <br>
-        {{ range .Message }}
+        {{ range .Errors }}
             <span id="username-errors" style="color: red;">{{.}}</span>
         <br>
         {{ end }}

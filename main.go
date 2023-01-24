@@ -22,32 +22,17 @@ func main() {
 		}
 
 		r.ParseForm()
-		username := r.Form.Get("username")
-		validationError := struct {
-			Message []string
-		}{
-			Message: []string{},
+
+		form := &SignupForm{
+			Username: r.Form.Get("username"),
 		}
 
-		if username != "terry" {
-			validationError.Message = append(validationError.Message, "username must be terry")
-		}
+		form.Validate()
 
-		if username == "" {
-			validationError.Message = append(validationError.Message, "username cannot be blank")
-		}
-
-		if len(username) < 3 {
-			validationError.Message = append(validationError.Message, "username must be at least 3 characters")
-		}
-
-		if len(username) > 10 {
-			validationError.Message = append(validationError.Message, "username must be at most 10 characters")
-		}
 		// if there are any errors, re-render the form
-		if len(validationError.Message) > 0 {
+		if len(form.Errors) > 0 {
 			formPage := template.Must(template.New("form.template.html").ParseFiles("form.template.html"))
-			if err := formPage.Execute(w, validationError); err != nil {
+			if err := formPage.Execute(w, form); err != nil {
 				fmt.Println(err)
 			}
 			// else redirect to the success page :)
