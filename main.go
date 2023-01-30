@@ -3,12 +3,30 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	"os"
 )
 
+const viewPath = "views"
+
 func main() {
+
+	templates := map[string]*template.Template{}
+
+	viewPaths, err := os.ReadDir(viewPath)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, view := range viewPaths {
+		filePath := viewPath + "/" + view.Name()
+		templates[view.Name()] = template.Must(template.New(view.Name()).ParseFiles(filePath))
+	}
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		formPage := template.Must(template.New("form.template.html").ParseFiles("form.template.html"))
+		formPage := templates["signup_form.html"]
 		if err := formPage.Execute(w, nil); err != nil {
 			fmt.Println(err)
 		}
@@ -31,7 +49,7 @@ func main() {
 
 		// if there are any errors, re-render the form
 		if len(form.Errors) > 0 {
-			formPage := template.Must(template.New("form.template.html").ParseFiles("form.template.html"))
+			formPage := templates["signup_form.html"]
 			if err := formPage.Execute(w, form); err != nil {
 				fmt.Println(err)
 			}
